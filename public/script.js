@@ -9,6 +9,11 @@ fetch('/api/books')
     renderBooks(books);        // Render them to the page
     setupMobileMenu();         // Setup nav bar mobile menu
     setupModal();              // Setup modal window behavior
+    setupEditModal();          // Setup edit modal
+  })
+  .catch(error => {
+    console.error('Error fetching books:', error);
+    document.querySelector('.book-grid').innerHTML = '<p>Error loading books. Please try again.</p>';
   });
 
 // ==================== DOM ELEMENTS ==================== //
@@ -22,7 +27,7 @@ const mobileMenuButton = document.createElement("button");
 function renderBooks(booksToRender) {
   bookGrid.innerHTML = booksToRender.map(book => `
     <div class="book-card">
-        <img src="${book.cover}" alt="${book.title}">
+        <img src="${book.cover}" alt="${book.title}" onerror="this.src='images/default.jpg'">
         <h4>${book.title}</h4>
         <p class="author">${book.author}</p>
         <p class="status ${book.status}">
@@ -31,17 +36,35 @@ function renderBooks(booksToRender) {
               `Due back: ${new Date(book.dueDate).toLocaleDateString()}`
           }
         </p>
-        ${book.status === "available" ? 
-            `<button class="book-it-btn" data-id="${book.id}">Book It</button>` : ""
-        }
+        <div class="book-actions">
+          ${book.status === "available" ? 
+              `<button class="book-it-btn" data-id="${book.id}">Book It</button>` : ""
+          }
+          <button class="edit-btn" data-id="${book.id}">Edit</button>
+          <button class="delete-btn" data-id="${book.id}">Delete</button>
+        </div>
     </div>
   `).join("");
 
-  // Add click events to each "Book It" button
+  // Add click events to each button
   document.querySelectorAll(".book-it-btn").forEach(btn => {
     btn.addEventListener("click", (e) => {
       const bookId = e.target.getAttribute("data-id");
       reserveBook(bookId);
+    });
+  });
+
+  document.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const bookId = e.target.getAttribute("data-id");
+      openEditModal(bookId);
+    });
+  });
+
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const bookId = e.target.getAttribute("data-id");
+      deleteBook(bookId);
     });
   });
 }
@@ -81,6 +104,67 @@ function reserveBook(bookId) {
   }
 }
 
+// ==================== EDIT BOOK FUNCTIONALITY ==================== //
+function openEditModal(bookId) {
+  const book = books.find(b => b.id == bookId);
+  if (book) {
+    const editModal = document.getElementById("editModal");
+    const editForm = document.getElementById("editForm");
+    
+    // Populate form fields
+    editForm.querySelector('[name="id"]').value = book.id;
+    editForm.querySelector('[name="title"]').value = book.title;
+    editForm.querySelector('[name="author"]').value = book.author;
+    editForm.querySelector('[name="status"]').value = book.status;
+    editForm.querySelector('[name="duedate"]').value = book.dueDate ? book.dueDate.split('T')[0] : '';
+    
+    editModal.style.display = "flex";
+  }
+}
+
+function updateBook(bookId, bookData) {
+  fetch(`/books/${bookId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(bookData)
+  })
+  .then(res => res.json())
+  .then(updatedBook => {
+    // Update local books array
+    const index = books.findIndex(b => b.id == bookId);
+    if (index !== -1) {
+      books[index] = updatedBook;
+      renderBooks(books);
+    }
+    closeEditModal();
+  })
+  .catch(error => {
+    console.error('Error updating book:', error);
+    alert('Error updating book. Please try again.');
+  });
+}
+
+// ==================== DELETE BOOK FUNCTIONALITY ==================== //
+function deleteBook(bookId) {
+  if (confirm('Are you sure you want to delete this book?')) {
+    fetch(`/books/${bookId}`, {
+      method: 'DELETE'
+    })
+    .then(res => res.json())
+    .then(data => {
+      // Remove from local books array
+      books = books.filter(b => b.id != bookId);
+      renderBooks(books);
+    })
+    .catch(error => {
+      console.error('Error deleting book:', error);
+      alert('Error deleting book. Please try again.');
+    });
+  }
+}
+
 // ==================== SETUP MODAL (POPUP WINDOW) ==================== //
 function setupModal() {
   const modal = document.getElementById("bookingModal");
@@ -106,6 +190,43 @@ function setupModal() {
       renderBooks(books);
     }
   });
+}
+
+// ==================== SETUP EDIT MODAL ==================== //
+function setupEditModal() {
+  const editModal = document.getElementById("editModal");
+  const editForm = document.getElementById("editForm");
+  const closeEditBtn = document.querySelector(".close-edit");
+
+  // Close edit modal on 'X' button
+  closeEditBtn.addEventListener("click", closeEditModal);
+
+  // Handle form submission
+  editForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const formData = new FormData(editForm);
+    const bookData = {
+      title: formData.get('title'),
+      author: formData.get('author'),
+      status: formData.get('status'),
+      dueDate: formData.get('duedate') || null
+    };
+    
+    const bookId = formData.get('id');
+    updateBook(bookId, bookData);
+  });
+
+  // Close modal if clicking outside
+  window.addEventListener("click", (e) => {
+    if (e.target === editModal) {
+      closeEditModal();
+    }
+  });
+}
+
+function closeEditModal() {
+  const editModal = document.getElementById("editModal");
+  editModal.style.display = "none";
 }
 
 // ==================== NAVBAR - MOBILE MENU TOGGLE ==================== //

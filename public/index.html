@@ -39,13 +39,35 @@
     <div class="book-grid"></div>
   </section>
 
-  <!-- Modal -->
+  <!-- Booking Modal -->
   <div class="modal" id="bookingModal">
     <div class="modal-content">
       <span class="close">&times;</span>
       <h3>Book Reserved Successfully!</h3>
       <p id="modalMessage"></p>
       <button id="confirmButton">OK</button>
+    </div>
+  </div>
+
+  <!-- Edit Book Modal -->
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <span class="close-edit">&times;</span>
+      <h3>Edit Book</h3>
+      <form id="editForm">
+        <input type="hidden" name="id" required>
+        <input name="title" placeholder="Book Title" required>
+        <input name="author" placeholder="Author" required>
+        <select name="status" required>
+          <option value="available">Available</option>
+          <option value="unavailable">Unavailable</option>
+        </select>
+        <input name="duedate" type="date" placeholder="Due Date (optional)">
+        <div class="form-buttons">
+          <button type="submit">Update Book</button>
+          <button type="button" onclick="closeEditModal()">Cancel</button>
+        </div>
+      </form>
     </div>
   </div>
 
