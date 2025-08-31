@@ -1,5 +1,4 @@
 const express = require('express');
-const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 
@@ -29,9 +28,17 @@ function loadBooks() {
     booksInMemory = [
       {
         "id": 1,
-        "title": "Sample Book",
-        "author": "Sample Author",
-        "cover": "images/default.jpg",
+        "title": "The Great Gatsby",
+        "author": "F. Scott Fitzgerald",
+        "cover": "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop",
+        "status": "available",
+        "dueDate": null
+      },
+      {
+        "id": 2,
+        "title": "To Kill a Mockingbird",
+        "author": "Harper Lee",
+        "cover": "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=300&h=400&fit=crop",
         "status": "available",
         "dueDate": null
       }
@@ -52,11 +59,14 @@ function saveBooks(books) {
   }
 }
 
+// Generate unique ID
+function generateId() {
+  const books = loadBooks();
+  return Math.max(...books.map(book => book.id), 0) + 1;
+}
+
 // Initialize books
 loadBooks();
-
-// Multer setup for file upload (cover image)
-const upload = multer({ dest: path.join(__dirname, 'public', 'images') });
 
 // Middleware
 app.use(express.json());
@@ -76,23 +86,29 @@ app.get('/api/books', (req, res) => {
   }
 });
 
-// POST to add book via API (for testing)
+// POST to add book via API
 app.post('/api/books', (req, res) => {
   try {
-    const { id, title, author, cover, status, dueDate } = req.body;
+    const { title, author, status, dueDate } = req.body;
+    
+    // Validation
+    if (!title || !author) {
+      return res.status(400).json({ error: 'Title and author are required' });
+    }
+
     const books = loadBooks();
-
-    books.push({
-      id: Number(id),
-      title,
-      author,
-      cover: cover || "images/default.jpg",
-      status,
+    const newBook = {
+      id: generateId(),
+      title: title.trim(),
+      author: author.trim(),
+      cover: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop",
+      status: status || "available",
       dueDate: dueDate || null
-    });
+    };
 
+    books.push(newBook);
     saveBooks(books);
-    res.json({ message: 'Book added successfully', book: books[books.length - 1] });
+    res.json({ message: 'Book added successfully', book: newBook });
   } catch (error) {
     console.error('Error adding book via API:', error);
     res.status(500).json({ error: 'Failed to add book' });
@@ -119,28 +135,48 @@ app.get('/test', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'test.html'));
 });
 
-// POST to add new book
-app.post('/newbook', upload.single('cover'), (req, res) => {
+// POST to add new book (simplified for Vercel)
+app.post('/newbook', (req, res) => {
   try {
-    const { id, title, author, status, duedate } = req.body;
-    const cover = req.file ? `images/${req.file.filename}` : "images/default.jpg";
+    const { title, author, status, duedate } = req.body;
+    
+    // Validation
+    if (!title || !author) {
+      return res.status(400).send(`
+        <html>
+          <head><title>Error</title></head>
+          <body>
+            <h2>Error: Title and author are required</h2>
+            <a href="/new">Go back</a>
+          </body>
+        </html>
+      `);
+    }
 
     const books = loadBooks();
-
-    books.push({
-      id: Number(id),
-      title,
-      author,
-      cover,
-      status,
+    const newBook = {
+      id: generateId(),
+      title: title.trim(),
+      author: author.trim(),
+      cover: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop",
+      status: status || "available",
       dueDate: duedate || null
-    });
+    };
 
+    books.push(newBook);
     saveBooks(books);
     res.redirect('/home');
   } catch (error) {
     console.error('Error adding book:', error);
-    res.status(500).send('Error adding book');
+    res.status(500).send(`
+      <html>
+        <head><title>Error</title></head>
+        <body>
+          <h2>Error adding book</h2>
+          <a href="/new">Go back</a>
+        </body>
+      </html>
+    `);
   }
 });
 

@@ -12,10 +12,10 @@
   <nav class="navbar">
     <div class="logo">
       <i class="fas fa-book-open"></i>
-     <a href="/home" ><h1>BookHunt</h1></a>
+      <a href="/home"><h1>BookHunt</h1></a>
     </div>
     <ul class="nav-links">
-      <li><a href="/home">Home</a></li>
+      <li><a href="/home" class="active">Home</a></li>
       <li><a href="/new">Add Book</a></li>
       <li><a href="#">About</a></li>
     </ul>
@@ -27,25 +27,65 @@
       <h2>Find Your Book in Seconds</h2>
       <p>Check real-time availability in your library</p>
       <div class="search-bar">
-        <input type="text" placeholder="Search by title, author, or ISBN...">
-        <button><i class="fas fa-search"></i> Search</button>
+        <input type="text" placeholder="Search by title, author, or ISBN..." id="searchInput">
+        <button id="searchButton">
+          <i class="fas fa-search"></i> Search
+        </button>
       </div>
     </div>
   </section>
 
   <!-- Book List -->
   <section class="availability">
-    <h3>Currently Available Books</h3>
-    <div class="book-grid"></div>
+    <div class="section-header">
+      <h3>Currently Available Books</h3>
+      <div class="book-count">
+        <span id="bookCount">0</span> books found
+      </div>
+    </div>
+    
+    <!-- Loading State -->
+    <div id="loadingState" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading books...</p>
+    </div>
+    
+    <!-- Error State -->
+    <div id="errorState" class="error-state" style="display: none;">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h4>Oops! Something went wrong</h4>
+      <p>We couldn't load the books. Please try again.</p>
+      <button onclick="loadBooks()" class="retry-btn">
+        <i class="fas fa-redo"></i> Try Again
+      </button>
+    </div>
+    
+    <!-- Books Grid -->
+    <div id="bookGrid" class="book-grid"></div>
+    
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state" style="display: none;">
+      <i class="fas fa-books"></i>
+      <h4>No books found</h4>
+      <p>Try adjusting your search or add some books to get started.</p>
+      <a href="/new" class="add-book-btn">
+        <i class="fas fa-plus"></i> Add Your First Book
+      </a>
+    </div>
   </section>
 
   <!-- Booking Modal -->
   <div class="modal" id="bookingModal">
     <div class="modal-content">
       <span class="close">&times;</span>
-      <h3>Book Reserved Successfully!</h3>
+      <div class="modal-header">
+        <i class="fas fa-check-circle success-icon"></i>
+        <h3>Book Reserved Successfully!</h3>
+      </div>
       <p id="modalMessage"></p>
-      <button id="confirmButton">OK</button>
+      <button id="confirmButton" class="btn-primary">
+        <i class="fas fa-check"></i> OK
+      </button>
     </div>
   </div>
 
@@ -53,21 +93,59 @@
   <div class="modal" id="editModal">
     <div class="modal-content">
       <span class="close-edit">&times;</span>
-      <h3>Edit Book</h3>
+      <div class="modal-header">
+        <i class="fas fa-edit"></i>
+        <h3>Edit Book</h3>
+      </div>
       <form id="editForm">
         <input type="hidden" name="id" required>
-        <input name="title" placeholder="Book Title" required>
-        <input name="author" placeholder="Author" required>
-        <select name="status" required>
-          <option value="available">Available</option>
-          <option value="unavailable">Unavailable</option>
-        </select>
-        <input name="duedate" type="date" placeholder="Due Date (optional)">
-        <div class="form-buttons">
-          <button type="submit">Update Book</button>
-          <button type="button" onclick="closeEditModal()">Cancel</button>
+        <div class="form-group">
+          <label for="editTitle">Book Title</label>
+          <input name="title" id="editTitle" placeholder="Book Title" required>
+        </div>
+        <div class="form-group">
+          <label for="editAuthor">Author</label>
+          <input name="author" id="editAuthor" placeholder="Author" required>
+        </div>
+        <div class="form-group">
+          <label for="editStatus">Status</label>
+          <select name="status" id="editStatus" required>
+            <option value="available">Available</option>
+            <option value="unavailable">Unavailable</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="editDueDate">Due Date (if unavailable)</label>
+          <input name="duedate" id="editDueDate" type="date">
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeEditModal()" class="btn-secondary">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+          <button type="submit" class="btn-primary">
+            <i class="fas fa-save"></i> Update Book
+          </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal" id="deleteModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <i class="fas fa-exclamation-triangle warning-icon"></i>
+        <h3>Delete Book</h3>
+      </div>
+      <p>Are you sure you want to delete "<span id="deleteBookTitle"></span>"? This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button onclick="closeDeleteModal()" class="btn-secondary">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+        <button onclick="confirmDelete()" class="btn-danger">
+          <i class="fas fa-trash"></i> Delete
+        </button>
+      </div>
     </div>
   </div>
 
