@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('addBookForm');
     const titleInput = document.getElementById('title');
     const authorInput = document.getElementById('author');
+    const coverInput = document.getElementById('cover');
     const statusSelect = document.getElementById('status');
     const dueDateInput = document.getElementById('duedate');
     const submitBtn = document.getElementById('submitBtn');
@@ -20,6 +21,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     authorInput.addEventListener('input', function() {
         validateAuthor();
+    });
+
+    coverInput.addEventListener('change', function() {
+        handleFileUpload();
     });
 
     statusSelect.addEventListener('change', function() {
@@ -69,11 +74,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function validateCover() {
+        const file = coverInput.files[0];
+        const errorElement = document.getElementById('coverError');
+        
+        if (file) {
+            // Check file size (5MB limit)
+            if (file.size > 5 * 1024 * 1024) {
+                showError(coverInput, errorElement, 'File size must be less than 5MB');
+                return false;
+            }
+            
+            // Check file type
+            if (!file.type.startsWith('image/')) {
+                showError(coverInput, errorElement, 'Please select a valid image file');
+                return false;
+            }
+            
+            clearError(coverInput, errorElement);
+            return true;
+        }
+        
+        // Cover is optional, so no error if no file selected
+        clearError(coverInput, errorElement);
+        return true;
+    }
+
     function validateForm() {
         const isTitleValid = validateTitle();
         const isAuthorValid = validateAuthor();
+        const isCoverValid = validateCover();
         
-        return isTitleValid && isAuthorValid;
+        return isTitleValid && isAuthorValid && isCoverValid;
     }
 
     function showError(input, errorElement, message) {
@@ -86,6 +118,34 @@ document.addEventListener('DOMContentLoaded', function() {
         input.classList.remove('error');
         errorElement.textContent = '';
         errorElement.style.display = 'none';
+    }
+
+    function handleFileUpload() {
+        const file = coverInput.files[0];
+        const fileLabel = document.getElementById('fileLabel');
+        const filePreview = document.getElementById('filePreview');
+        const previewImage = document.getElementById('previewImage');
+        
+        if (file) {
+            // Update file label
+            fileLabel.textContent = file.name;
+            
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                filePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+            
+            // Validate the file
+            validateCover();
+        } else {
+            // Reset preview
+            fileLabel.textContent = 'Choose an image file';
+            filePreview.style.display = 'none';
+            previewImage.src = '';
+        }
     }
 
     function toggleDueDate() {
@@ -145,6 +205,21 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleDueDate();
 });
 
+// File management functions
+function removeFile() {
+    const coverInput = document.getElementById('cover');
+    const fileLabel = document.getElementById('fileLabel');
+    const filePreview = document.getElementById('filePreview');
+    
+    coverInput.value = '';
+    fileLabel.textContent = 'Choose an image file';
+    filePreview.style.display = 'none';
+    
+    // Clear any error messages
+    const errorElement = document.getElementById('coverError');
+    clearError(coverInput, errorElement);
+}
+
 // Navigation functions
 function goBack() {
     if (confirm('Are you sure you want to cancel? All entered data will be lost.')) {
@@ -159,7 +234,20 @@ function goHome() {
 function addAnother() {
     document.getElementById('successModal').style.display = 'none';
     document.getElementById('addBookForm').reset();
+    document.getElementById('filePreview').style.display = 'none';
+    document.getElementById('fileLabel').textContent = 'Choose an image file';
     document.getElementById('title').focus();
+    
+    // Clear all error messages
+    document.querySelectorAll('.error-message').forEach(el => {
+        el.textContent = '';
+        el.style.display = 'none';
+    });
+    
+    // Remove error classes
+    document.querySelectorAll('.error').forEach(el => {
+        el.classList.remove('error');
+    });
 }
 
 // Close modal when clicking outside

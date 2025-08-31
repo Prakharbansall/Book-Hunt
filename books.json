@@ -1,34 +1,122 @@
 [
   {
     "id": 1,
-    "title": "Moutain",
-    "author": "Prakhar bansal",
-    "cover": "images/514460f5e41d6f30819fb29487c93331",
+    "title": "The Great Gatsby",
+    "author": "F. Scott Fitzgerald",
+    "cover": "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop",
     "status": "available",
-    "dueDate": "2025-07-04"
+    "dueDate": null
   },
   {
     "id": 2,
-    "title": "Moutain",
-    "author": "Prakhar bansal",
-    "cover": "images/514460f5e41d6f30819fb29487c93331",
+    "title": "To Kill a Mockingbird",
+    "author": "Harper Lee",
+    "cover": "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=300&h=400&fit=crop",
     "status": "available",
-    "dueDate": "2025-07-04"
+    "dueDate": null
   },
   {
     "id": 3,
-    "title": "Moutain",
-    "author": "Prakhar bansal",
-    "cover": "images/514460f5e41d6f30819fb29487c93331",
+    "title": "1984",
+    "author": "George Orwell",
+    "cover": "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=300&h=400&fit=crop",
     "status": "available",
-    "dueDate": "2025-07-04"
+    "dueDate": null
   },
   {
-    "id": 1,
-    "title": "Moutain",
-    "author": "Prakhar bansal",
-    "cover": "images/7bebbbe58731cc0f15f5f417c6bff5e7",
+    "id": 4,
+    "title": "Pride and Prejudice",
+    "author": "Jane Austen",
+    "cover": "https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=300&h=400&fit=crop",
     "status": "available",
-    "dueDate": "2025-07-04"
+    "dueDate": null
+  },
+  {
+    "id": 5,
+    "title": "The Catcher in the Rye",
+    "author": "J.D. Salinger",
+    "cover": "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=400&fit=crop",
+    "status": "available",
+    "dueDate": null
+  },
+  {
+    "id": 6,
+    "title": "Lord of the Flies",
+    "author": "William Golding",
+    "cover": "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=300&h=400&fit=crop",
+    "status": "available",
+    "dueDate": null
+  },
+  {
+    "id": 7,
+    "title": "Animal Farm",
+    "author": "George Orwell",
+    "cover": "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop",
+    "status": "available",
+    "dueDate": null
+  },
+  {
+    "id": 8,
+    "title": "The Hobbit",
+    "author": "J.R.R. Tolkien",
+    "cover": "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=300&h=400&fit=crop",
+    "status": "available",
+    "dueDate": null
+  },
+  {
+    "id": 9,
+    "title": "Fahrenheit 451",
+    "author": "Ray Bradbury",
+    "cover": "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=400&fit=crop",
+    "status": "available",
+    "dueDate": null
+  },
+  {
+    "id": 10,
+    "title": "The Alchemist",
+    "author": "Paulo Coelho",
+    "cover": "https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=300&h=400&fit=crop",
+    "status": "available",
+    "dueDate": null
+  },
+  {
+    "id": 11,
+    "title": "The Kite Runner",
+    "author": "Khaled Hosseini",
+    "cover": "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop",
+    "status": "available",
+    "dueDate": null
+  },
+  {
+    "id": 12,
+    "title": "The Book Thief",
+    "author": "Markus Zusak",
+    "cover": "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=300&h=400&fit=crop",
+    "status": "available",
+    "dueDate": null
+  },
+  {
+    "id": 13,
+    "title": "The Fault in Our Stars",
+    "author": "John Green",
+    "cover": "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=400&fit=crop",
+    "status": "available",
+    "dueDate": null
+  },
+  {
+    "id": 14,
+    "title": "Gone Girl",
+    "author": "Gillian Flynn",
+    "cover": "https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=300&h=400&fit=crop",
+    "status": "available",
+    "dueDate": null
+  },
+  {
+    "id": 15,
+    "title": "The Martian",
+    "author": "Andy Weir",
+    "cover": "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop",
+    "status": "available",
+    "dueDate": null
   }
 ]

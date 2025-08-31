@@ -29,7 +29,7 @@
         <p>Fill in the details below to add a new book to the library</p>
       </div>
 
-      <form id="addBookForm" method="post" action="/newbook">
+      <form id="addBookForm" method="post" action="/newbook" enctype="multipart/form-data">
         <div class="form-group">
           <label for="title">
             <i class="fas fa-book"></i> Book Title *
@@ -60,6 +60,33 @@
             maxlength="100"
           />
           <span class="error-message" id="authorError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="cover">
+            <i class="fas fa-image"></i> Book Cover Image
+          </label>
+          <div class="file-upload-container">
+            <input 
+              type="file" 
+              id="cover" 
+              name="cover" 
+              accept="image/*"
+              class="file-input"
+            />
+            <label for="cover" class="file-upload-label">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <span id="fileLabel">Choose an image file</span>
+            </label>
+            <div class="file-preview" id="filePreview" style="display: none;">
+              <img id="previewImage" src="" alt="Preview">
+              <button type="button" class="remove-file" onclick="removeFile()">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <small class="file-info">Accepted formats: JPG, PNG, GIF (Max 5MB)</small>
+          <span class="error-message" id="coverError"></span>
         </div>
 
         <div class="form-group">
