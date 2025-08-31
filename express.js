@@ -9,6 +9,52 @@ const port = process.env.PORT || 3000;
 // Path to books file
 const booksFile = path.join(__dirname, 'books.json');
 
+// In-memory storage for Vercel (fallback)
+let booksInMemory = [];
+
+// Try to load books from file, fallback to in-memory
+function loadBooks() {
+  try {
+    if (fs.existsSync(booksFile)) {
+      const books = JSON.parse(fs.readFileSync(booksFile, 'utf-8'));
+      booksInMemory = books;
+      return books;
+    }
+  } catch (error) {
+    console.error('Error loading books from file:', error);
+  }
+  
+  // Fallback to default books if file doesn't exist
+  if (booksInMemory.length === 0) {
+    booksInMemory = [
+      {
+        "id": 1,
+        "title": "Sample Book",
+        "author": "Sample Author",
+        "cover": "images/default.jpg",
+        "status": "available",
+        "dueDate": null
+      }
+    ];
+  }
+  
+  return booksInMemory;
+}
+
+// Save books to file or memory
+function saveBooks(books) {
+  booksInMemory = books;
+  try {
+    fs.writeFileSync(booksFile, JSON.stringify(books, null, 2));
+  } catch (error) {
+    console.error('Error saving books to file:', error);
+    // Continue with in-memory storage
+  }
+}
+
+// Initialize books
+loadBooks();
+
 // Multer setup for file upload (cover image)
 const upload = multer({ dest: path.join(__dirname, 'public', 'images') });
 
@@ -22,11 +68,34 @@ app.use(express.static(path.join(__dirname, 'public')));
 // GET all books as JSON
 app.get('/api/books', (req, res) => {
   try {
-    const books = JSON.parse(fs.readFileSync(booksFile, 'utf-8'));
+    const books = loadBooks();
     res.json(books);
   } catch (error) {
     console.error('Error reading books:', error);
-    res.status(500).json({ error: 'Failed to load books' });
+    res.status(500).json({ error: 'Failed to load books', books: booksInMemory });
+  }
+});
+
+// POST to add book via API (for testing)
+app.post('/api/books', (req, res) => {
+  try {
+    const { id, title, author, cover, status, dueDate } = req.body;
+    const books = loadBooks();
+
+    books.push({
+      id: Number(id),
+      title,
+      author,
+      cover: cover || "images/default.jpg",
+      status,
+      dueDate: dueDate || null
+    });
+
+    saveBooks(books);
+    res.json({ message: 'Book added successfully', book: books[books.length - 1] });
+  } catch (error) {
+    console.error('Error adding book via API:', error);
+    res.status(500).json({ error: 'Failed to add book' });
   }
 });
 
@@ -45,13 +114,18 @@ app.get('/new', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'newbook.html'));
 });
 
+// Serve test page
+app.get('/test', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'test.html'));
+});
+
 // POST to add new book
 app.post('/newbook', upload.single('cover'), (req, res) => {
   try {
     const { id, title, author, status, duedate } = req.body;
     const cover = req.file ? `images/${req.file.filename}` : "images/default.jpg";
 
-    const books = JSON.parse(fs.readFileSync(booksFile, 'utf-8'));
+    const books = loadBooks();
 
     books.push({
       id: Number(id),
@@ -62,7 +136,7 @@ app.post('/newbook', upload.single('cover'), (req, res) => {
       dueDate: duedate || null
     });
 
-    fs.writeFileSync(booksFile, JSON.stringify(books, null, 2));
+    saveBooks(books);
     res.redirect('/home');
   } catch (error) {
     console.error('Error adding book:', error);
@@ -73,7 +147,7 @@ app.post('/newbook', upload.single('cover'), (req, res) => {
 // GET single book for editing
 app.get("/books/:id", (req, res) => {
   try {
-    const books = JSON.parse(fs.readFileSync(booksFile, 'utf-8'));
+    const books = loadBooks();
     const { id } = req.params;
     const book = books.find((b) => b.id === Number(id));
 
@@ -91,13 +165,13 @@ app.get("/books/:id", (req, res) => {
 // PUT to update book
 app.put("/books/:id", (req, res) => {
   try {
-    const books = JSON.parse(fs.readFileSync(booksFile, 'utf-8'));
+    const books = loadBooks();
     const { id } = req.params;
     const bookIndex = books.findIndex((b) => b.id === Number(id));
 
     if (bookIndex !== -1) {
       books[bookIndex] = { ...books[bookIndex], ...req.body };
-      fs.writeFileSync(booksFile, JSON.stringify(books, null, 2));
+      saveBooks(books);
       res.json(books[bookIndex]);
     } else {
       res.status(404).send("Book not found");
@@ -111,13 +185,13 @@ app.put("/books/:id", (req, res) => {
 // DELETE book
 app.delete("/books/:id", (req, res) => {
   try {
-    const books = JSON.parse(fs.readFileSync(booksFile, 'utf-8'));
+    const books = loadBooks();
     const { id } = req.params;
     const bookIndex = books.findIndex((b) => b.id === Number(id));
 
     if (bookIndex !== -1) {
       books.splice(bookIndex, 1);
-      fs.writeFileSync(booksFile, JSON.stringify(books, null, 2));
+      saveBooks(books);
       res.json({ message: 'Book deleted successfully' });
     } else {
       res.status(404).send("Book not found");
@@ -126,6 +200,11 @@ app.delete("/books/:id", (req, res) => {
     console.error('Error deleting book:', error);
     res.status(500).json({ error: 'Failed to delete book' });
   }
+});
+
+// Health check endpoint for Vercel
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', booksCount: booksInMemory.length });
 });
 
 // Start server

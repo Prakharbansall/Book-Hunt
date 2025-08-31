@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test - BookHunt</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>BookHunt API Test</h1>
+    <p>This page tests if the API endpoints are working on Vercel.</p>
+    
+    <button onclick="testHealth()">Test Health Check</button>
+    <button onclick="testBooks()">Test Books API</button>
+    <button onclick="testAddBook()">Test Add Book</button>
+    
+    <div id="results"></div>
+
+    <script>
+        function addResult(message, isSuccess = true) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${isSuccess ? 'success' : 'error'}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        async function testHealth() {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                addResult(`Health Check: ${JSON.stringify(data)}`);
+            } catch (error) {
+                addResult(`Health Check Error: ${error.message}`, false);
+            }
+        }
+
+        async function testBooks() {
+            try {
+                const response = await fetch('/api/books');
+                const data = await response.json();
+                addResult(`Books API: Found ${data.length} books`);
+                console.log('Books data:', data);
+            } catch (error) {
+                addResult(`Books API Error: ${error.message}`, false);
+            }
+        }
+
+        async function testAddBook() {
+            try {
+                const testBook = {
+                    id: Date.now(),
+                    title: "Test Book",
+                    author: "Test Author",
+                    cover: "images/default.jpg",
+                    status: "available",
+                    dueDate: null
+                };
+
+                const response = await fetch('/api/books', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testBook)
+                });
+
+                if (response.ok) {
+                    addResult('Add Book: Success');
+                } else {
+                    addResult(`Add Book Error: ${response.status}`, false);
+                }
+            } catch (error) {
+                addResult(`Add Book Error: ${error.message}`, false);
+            }
+        }
+    </script>
+</body>
+</html>

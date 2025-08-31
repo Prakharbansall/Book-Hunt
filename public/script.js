@@ -2,9 +2,19 @@
 // This fetches the latest book list from the backend API endpoint (/api/books)
 let books = [];
 
+// Add debugging information
+console.log('Script loaded, attempting to fetch books...');
+
 fetch('/api/books')
-  .then(res => res.json())
+  .then(res => {
+    console.log('Response status:', res.status);
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    return res.json();
+  })
   .then(data => {
+    console.log('Books data received:', data);
     books = data;              // Store fetched books in global array
     renderBooks(books);        // Render them to the page
     setupMobileMenu();         // Setup nav bar mobile menu
@@ -13,7 +23,13 @@ fetch('/api/books')
   })
   .catch(error => {
     console.error('Error fetching books:', error);
-    document.querySelector('.book-grid').innerHTML = '<p>Error loading books. Please try again.</p>';
+    document.querySelector('.book-grid').innerHTML = `
+      <div style="text-align: center; padding: 2rem;">
+        <p>Error loading books. Please try again.</p>
+        <p>Error details: ${error.message}</p>
+        <button onclick="location.reload()">Retry</button>
+      </div>
+    `;
   });
 
 // ==================== DOM ELEMENTS ==================== //
@@ -25,6 +41,13 @@ const mobileMenuButton = document.createElement("button");
 // ==================== RENDER BOOKS TO PAGE ==================== //
 // This function displays all books in a grid layout
 function renderBooks(booksToRender) {
+  console.log('Rendering books:', booksToRender);
+  
+  if (!booksToRender || booksToRender.length === 0) {
+    bookGrid.innerHTML = '<p style="text-align: center; padding: 2rem;">No books available.</p>';
+    return;
+  }
+
   bookGrid.innerHTML = booksToRender.map(book => `
     <div class="book-card">
         <img src="${book.cover}" alt="${book.title}" onerror="this.src='images/default.jpg'">
