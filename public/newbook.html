@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add New Book</title>
+  <link rel="stylesheet" href="newbook.css"
+</head>
+<body>
+  <form method="post" action="/newbook" enctype="multipart/form-data">
+    <h2>Add New Book</h2>
+    <input name="id" type="number" placeholder="Book ID" required />
+    <input name="title" placeholder="Book Title" required />
+    <input name="author" placeholder="Author" required />
+    <input name="cover" type="file" accept="image/*" required />
+    <input name="status" placeholder="Available or Unavailable" required />
+    <input name="duedate" type="date" placeholder="Due Date (optional)" />
+    <button type="submit">Add Book</button>
+  </form>
+</body>
+</html>

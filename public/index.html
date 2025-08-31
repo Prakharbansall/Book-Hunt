@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BookHunt | Find Library Books Instantly</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">
+      <i class="fas fa-book-open"></i>
+     <a href="/home" ><h1>BookHunt</h1></a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="/home">Home</a></li>
+      <li><a href="/new">Add Book</a></li>
+      <li><a href="#">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h2>Find Your Book in Seconds</h2>
+      <p>Check real-time availability in your library</p>
+      <div class="search-bar">
+        <input type="text" placeholder="Search by title, author, or ISBN...">
+        <button><i class="fas fa-search"></i> Search</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Book List -->
+  <section class="availability">
+    <h3>Currently Available Books</h3>
+    <div class="book-grid"></div>
+  </section>
+
+  <!-- Modal -->
+  <div class="modal" id="bookingModal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>Book Reserved Successfully!</h3>
+      <p id="modalMessage"></p>
+      <button id="confirmButton">OK</button>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2024 BookHunt. Helping students find books faster.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
